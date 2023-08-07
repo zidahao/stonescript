@@ -3,7 +3,7 @@
 // 其他信息请见:StoneStoryRPG.com/stonescript.
 // ——贤者贝赛拉
 
-import Cosmetics/PetBoo
+import https://StoneStoryRPG.com/stonescript/Cosmetics/PetBoo.txt
 //import Cosmetics/Hats/Skully
 
 ?loc.begin
