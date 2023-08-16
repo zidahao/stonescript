@@ -1,0 +1,412 @@
+/*
+使用说明
+1.把此文件复制或移动到脚本文件夹下，也就是 Stonescript 里，将文件命名为 ShakeAfter。
+2.将此脚本作为变量导入，例：
+?loc.begin
+ var shakeAfter1 = new ShakeAfter
+ var shakeAfter2 = new ShakeAfter
+每一个变量都能控制一把双手武器、一把左手和一把右手，如果你需要在关卡内在某个位置上使用多把取消后摇的武器，就请用一个新的变量。
+例如你已经用 shakeAfter1.L("Vigor sword +20",5,2,2) 来在左手使用 Vigor sword +20，还想用火剑的话，就用 shakeAfter2.L("Fire sword +20",5,2,2)。打大眼可能要用到用到 8 个，那就加到 8 个。
+
+3.为每一个变量在循环开始时进行初始化操作，例：
+?loc.loop
+ shakeAfter1.loop()
+ shakeAfter2.loop()
+如果你不进行此操作，那么经过衔尾蛇之后就会出问题
+
+4.调用
+双手武器的函数是 TH(item,range,preHitFrames,cooldown)，左手是把 TH 改成 L，右手是改成 R，在前面接你赋值的变量名，例如：
+shakeAfter1.L("Vigor sword +21",5,2,2)，在左手装备取消后摇的 Vigor sword +21
+item 是武器名，就按你平时 equip 后面写的那样写，记得用""包裹。
+range 是武器距离，请填武器拿在你分配的那只手上时的距离，武器装备在右手和双手上时距离会 +1，你可以直接把武器装备到对应手上后看距离。
+preHitFrames 是前摇帧数，从攻击开始一直到产生伤害判定前一帧的帧数。
+cooldown 是冷却，在产生伤害判定的那一帧立即取消后摇后需要等待该时间后才会开始下一次攻击。
+这两个值你可以用 Test(item) 来测试，例如 shakeAfter1.Test(item)。你需要选一个不会被你一击秒杀、不会在你两次攻击间打断、减速你的敌人，推荐卫城守卫，例如：
+?loc = Rocky
+ shakeAfter1.Test("arm")
+还有一种方法，就是查表：
+https://docs.google.com/spreadsheets/d/14AwQNn11qSGf9aQAi89p5QEAKClMnJYvzfDXiuWHtGw/edit#gid=1289578887
+这个表群文件里也有一份，搜 SSRPG Item Factory V1.9
+首先找到你要查的武器，灰色的代表星级，有些武器的攻速不会随星级提升，所以他们只有 0 星，后面的攻速的附魔等级，你可以直接通过颜色来判断。
+找到对应攻速等级后你就知道了对应的 Cast 和 Cooldown 值，注意不要直接照填，你需要将 Cast - 1 填入 preHitFrames，Cooldown + 1 填入 cooldown。该表数据我没有发现有错的，如果感觉填入后表现不对可以用脚本提供的函数测试。
+
+5.使用规范
+此函数运行时会固定装备你指定的武器，因此请不要用任何其他的装备的代码覆盖此代码。
+下面是一个错误示范：
+?loc = forest
+ shakeAfter1.TH("arm",7,12,1)
+ ?foe.distance >= 11
+  equipL triskelion
+这样的话装备 triskelion 的代码就会覆盖装备 arm 的代码，取消后摇可能会出问题
+正确的写法应该是这样：
+?loc = forest
+ ?foe.distance >= 11
+  equipL triskelion
+ :
+  shakeAfter1.TH("arm",7,12,1)
+这样就不会产生覆盖
+记住！不要让其他装备代码覆盖取消后摇代码！
+
+6.已知问题
+弩取消后摇时有可能会将冷却锁定到最大值，这会导致从别的武器换成弩后的初次攻击被打断，目前没有探明触发条件。
+不过弩在升到 +11 攻速后冷却就是最低的 2 了，不管触不触发这种情况表现都是一样的，所以还好。
+锤子上也观察到过这种情况，不过锤子一般不会也频繁切换。
+
+还有一个问题，当冷却没有在这一循环中走完时，到了下一循环会被锁定到最大值，但在锤子打眼睛上会观察到这一值少了一帧，反正就一帧，先不管了。
+
+7.额外功能
+如果你希望每次取消后摇时在脚下显示 shake，可以搜索 //>o-2 并将 // 删掉
+
+*/
+
+//初始化全局变量
+?loc.begin
+  var lastPosZ = 0
+  var kill = false
+  var lastKill = false
+  var lastFoeCount = 0
+  var lastFoe = ""
+  var lastFoeHp = 0
+  var lastFoeLevel = 0
+  var lastFoeDistance = 0
+  var totalLoop = 0
+
+?loc.begin//双手
+  var startTimeTH = 0
+  var lastItemTH = item.right
+  var isCooldownCalculatedTH = true
+  var waitTimeTH = 0
+  var lastTimeTH = 0
+  var isChangeTH = false
+  var cooldownEndFrameTH = 0
+  var recoveryEndTimeTH = 0
+  var remainingCooldownTH = 0
+  var lastLoopTH = 0
+
+?loc.begin//左手
+  var startTimeL = 0
+  var lastItemL = item.right
+  var isCooldownCalculatedL = true
+  var waitTimeL = 0
+  var lastTimeL = 0
+  var isChangeL = false
+  var cooldownEndFrameL = 0
+  var recoveryEndTimeL = 0
+  var remainingCooldownL = 0
+  var lastLoopL = 0
+
+?loc.begin//右手
+  var startTimeR = 0
+  var lastItemR = item.right
+  var isCooldownCalculatedR = true
+  var waitTimeR = 0
+  var lastTimeR = 0
+  var isChangeR = false
+  var cooldownEndFrameR = 0
+  var recoveryEndTimeR = 0
+  var remainingCooldownR = 0
+  var lastLoopR = 0
+
+?loc.begin//测试前摇与冷却帧数
+  var testPreHitFrames = 0
+  var isTestPreHitFramesCompleted = 0
+  var testcooldown = 0
+  var testStartTime = 0
+  var lastFoeArmor = 0
+  var isTestCooldownCompleted = 0
+
+
+//循环开始时重置记数
+func loop()
+  ?loc.loop
+    kill = 0 
+    lastFoeLevel = 0
+    totalLoop++
+
+  ?loc.loop//双手
+    startTimeTH = 0
+    cooldownEndFrameTH = 0
+
+  ?loc.loop//左手
+    startTimeL = 0
+    cooldownEndFrameL = 0
+
+  ?loc.loop//右手
+    startTimeR = 0
+    cooldownEndFrameR = 0
+
+
+//双手取消后摇
+func TH(item,range,preHitFrames,cooldown) // 武器名, 武器距离, 前摇帧数, 冷却时间
+
+  //正常持握
+  equip @item@
+
+  //如果本帧是此次代码运行的第一帧
+  ?lastTimeTH ! totaltime - 1 | totaltime = 0
+    //计算等待时间
+    ?cooldownEndFrameTH > totaltime + 1 //如果冷却未走到最后两帧
+      waitTimeTH = cooldownEndFrameTH - totaltime //计算剩余冷却
+    :?(cooldownEndFrameTH = totaltime + 1 | cooldownEndFrameTH = totaltime + 2) & startTimeTH ! totaltime - 1
+      waitTimeTH = 2 //冷却只剩必须装备对应武器才会计算的最后两帧
+    :?lastLoopTH ! totalLoop & remainingCooldownTH ! 0 //如果残留冷却未走完就进入了下一循环
+      waitTimeTH = cooldown //将残留冷却锁定为最大值
+      lastLoopTH = totalLoop 
+    :?remainingCooldownTH <= 1 //如果冷却在上次运行时就走到最后一帧
+      waitTimeTH = 1
+    :
+      waitTimeTH = 2
+    lastItemTH = item.right
+    isChangeTH = true
+    lastPosZ = pos.z
+    kill = false
+    lastFoe = foe
+    lastFoeHp = foe.hp
+    lastFoeLevel = foe.level
+    lastFoeDistance = foe.distance
+  ://如果本帧不是此次代码运行的第一帧（item.right 有一帧延迟，因此要放在第二帧判断）
+    ?lastItemTH = item.right //如果没换装备
+      ?isChangeTH = true
+        startTimeTH = totaltime - 1 //启动时间为本次运行的第一帧
+    :
+      startTimeTH = totaltime - 1 + waitTimeTH //如果换了装备，计算等待时间
+      lastItemTH = item.right
+      isChangeTH = false
+    ?cooldownEndFrameTH = totaltime + 1//冷却已走到最后一帧
+      cooldownEndFrameTH = 0
+  lastTimeTH = totaltime
+  //计算冷却
+  ?remainingCooldownTH > 0
+    remainingCooldownTH--
+
+  //击杀检测
+  ?kill = true
+    lastKill = true
+  :
+    lastKill = false
+  ?foe.count < lastFoeCount
+    kill = true
+  :
+    kill = false
+  lastFoeCount = foe.count
+
+  //取消后摇
+  ?totaltime >= startTimeTH + preHitFrames & startTimeTH ! 0 & foe.count ! 0 | lastPosZ ! pos.z & lastKill = true & range <= 12
+    equip Star Stone
+    equip @item@
+    startTimeTH = totaltime + cooldown
+    //>o-2,4,shake
+  ://远程武器击杀/切换目标时会打断动作并进入一帧冷却，由于游戏没有给出足够的参数，无法 100% 精准判断
+    ?kill = true & (foe ! lastFoe | foe.level ! lastFoeLevel | foe.hp > lastFoeHp | item.right = socketed_crossbow & foe.distance > lastFoeDistance + 2) & totaltime > startTimeTH & range > 12
+      startTimeTH = totaltime + 1
+  
+  ?totaltime >= startTimeTH
+    ?foe.distance > range //在攻击距离外时预设置启动时间
+      startTimeTH = totaltime + 1
+    :?lastPosZ ! pos.z //进行 z 轴移动时重置等待时间，因为无法判断 z 轴距离是否够武器攻击，相比打断动作，延后取消后摇的时间更好
+      lastPosZ = pos.z
+      startTimeTH = totaltime
+
+  ?totaltime < startTimeTH + preHitFrames & totaltime = startTimeTH + preHitFrames - 1 & foe.count ! 0
+    cooldownEndFrameTH = totaltime + 1 + cooldown
+    remainingCooldownTH = 1 + cooldown
+ 
+  lastFoe = foe
+  lastFoeHp = foe.hp
+  lastFoeLevel = foe.level
+  lastFoeDistance = foe.distance
+
+//左手取消后摇
+func L(item,range,preHitFrames,cooldown)
+
+ //正常持握
+  equipL @item@
+
+ //如果本帧是此次代码运行的第一帧
+ ?lastTimeL ! totaltime - 1 | totaltime = 0
+  //计算等待时间
+  ?cooldownEndFrameL > totaltime + 1 //如果冷却未走到最后两帧
+   waitTimeL = cooldownEndFrameL - totaltime //计算剩余冷却
+  :?(cooldownEndFrameL = totaltime + 1 | cooldownEndFrameL = totaltime + 2) & startTimeL ! totaltime - 1
+   waitTimeL = 2 //冷却只剩必须装备对应武器才会计算的最后两帧
+  :?lastLoopL ! totalLoop & remainingCooldownL ! 0 //如果残留冷却未走完就进入了下一循环
+   waitTimeL = cooldown //将残留冷却锁定为最大值
+   lastLoopL = totalLoop 
+  :?remainingCooldownL <= 1 //如果冷却在上次运行时就走到最后一帧
+   waitTimeL = 1
+  :
+   waitTimeL = 2
+  lastItemL = item.left
+  isChangeL = true
+  lastPosZ = pos.z
+  kill = false
+  lastFoe = foe
+  lastFoeHp = foe.hp
+  lastFoeLevel = foe.level
+  lastFoeDistance = foe.distance
+ ://如果本帧不是此次代码运行的第一帧（item.left 有一帧延迟，因此要放在第二帧判断）
+  ?lastItemL = item.left //如果没换装备
+   ?isChangeL = true
+    startTimeL = totaltime - 1 //启动时间为本次运行的第一帧
+  :
+    startTimeL = totaltime - 1 + waitTimeL //如果换了装备，计算等待时间
+   lastItemL = item.left
+   isChangeL = false
+  ?cooldownEndFrameL = totaltime + 1//冷却已走到最后一帧
+   cooldownEndFrameL = 0
+ lastTimeL = totaltime
+ //计算冷却
+ ?remainingCooldownL > 0
+  remainingCooldownL--
+
+ //击杀检测
+ ?kill = true
+  lastKill = true
+ :
+  lastKill = false
+ ?foe.count < lastFoeCount
+  kill = true
+ :
+  kill = false
+ lastFoeCount = foe.count
+
+ //取消后摇
+ ?totaltime >= startTimeL + preHitFrames & startTimeL ! 0 & foe.count ! 0 | lastPosZ ! pos.z & lastKill = true & range <= 12
+  equipL Star Stone
+  equipL @item@
+  startTimeL = totaltime + cooldown
+  //>o-2,4,shakeL
+ ://远程武器击杀/切换目标时会打断动作并进入一帧冷却，由于游戏没有给出足够的参数，无法 100% 精准判断
+  ?kill = true & (foe ! lastFoe | foe.level ! lastFoeLevel | foe.hp > lastFoeHp | item.left = socketed_crossbow & foe.distance > lastFoeDistance + 2) & totaltime > startTimeL & range > 12
+   startTimeL = totaltime + 1
+  
+ ?totaltime >= startTimeL
+  ?foe.distance > range //在攻击距离外时预设置启动时间
+   startTimeL = totaltime + 1
+  :?lastPosZ ! pos.z //进行 z 轴移动时重置等待时间，因为无法判断 z 轴距离是否够武器攻击，相比打断动作，延后取消后摇的时间更好
+   lastPosZ = pos.z
+   startTimeL = totaltime
+
+ ?totaltime < startTimeL + preHitFrames & totaltime = startTimeL + preHitFrames - 1 & foe.count ! 0
+  cooldownEndFrameL = totaltime + 1 + cooldown
+  remainingCooldownL = 1 + cooldown
+ 
+ lastFoe = foe
+ lastFoeHp = foe.hp
+ lastFoeLevel = foe.level
+ lastFoeDistance = foe.distance
+ 
+
+//右手取消后摇
+func R(item,range,preHitFrames,cooldown)
+
+ //正常持握
+  equipR @item@
+
+ //如果本帧是此次代码运行的第一帧
+ ?lastTimeR ! totaltime - 1 | totaltime = 0
+  //计算等待时间
+  ?cooldownEndFrameR > totaltime + 1 //如果冷却未走到最后两帧
+   waitTimeR = cooldownEndFrameR - totaltime //计算剩余冷却
+  :?(cooldownEndFrameR = totaltime + 1 | cooldownEndFrameR = totaltime + 2) & startTimeR ! totaltime - 1
+   waitTimeR = 2 //冷却只剩必须装备对应武器才会计算的最后两帧
+  :?lastLoopR ! totalLoop & remainingCooldownR ! 0 //如果残留冷却未走完就进入了下一循环
+   waitTimeR = cooldown //将残留冷却锁定为最大值
+   lastLoopR = totalLoop 
+  :?remainingCooldownR <= 1 //如果冷却在上次运行时就走到最后一帧
+   waitTimeR = 1
+  :
+   waitTimeR = 2
+  lastItemR = item.right
+  isChangeR = true
+  lastPosZ = pos.z
+  kill = false
+  lastFoe = foe
+  lastFoeHp = foe.hp
+  lastFoeLevel = foe.level
+  lastFoeDistance = foe.distance
+ ://如果本帧不是此次代码运行的第一帧（item.right 有一帧延迟，因此要放在第二帧判断）
+  ?lastItemR = item.right //如果没换装备
+   ?isChangeR = true
+    startTimeR = totaltime - 1 //启动时间为本次运行的第一帧
+  :
+    startTimeR = totaltime - 1 + waitTimeR //如果换了装备，计算等待时间
+   lastItemR = item.right
+   isChangeR = false
+  ?cooldownEndFrameR = totaltime + 1//冷却已走到最后一帧
+   cooldownEndFrameR = 0
+ lastTimeR = totaltime
+ //计算冷却
+ ?remainingCooldownR > 0
+  remainingCooldownR--
+
+ //击杀检测
+ ?kill = true
+  lastKill = true
+ :
+  lastKill = false
+ ?foe.count < lastFoeCount
+  kill = true
+ :
+  kill = false
+ lastFoeCount = foe.count
+
+ //取消后摇
+ ?totaltime >= startTimeR + preHitFrames & startTimeR ! 0 & foe.count ! 0 | lastPosZ ! pos.z & lastKill = true & range <= 12
+  equipR Star Stone
+  equipR @item@
+  startTimeR = totaltime + cooldown
+  //>o-2,5,shakeR
+ ://远程武器击杀/切换目标时会打断动作并进入一帧冷却，由于游戏没有给出足够的参数，无法 100% 精准判断
+  ?kill = true & (foe ! lastFoe | foe.level ! lastFoeLevel | foe.hp > lastFoeHp | item.right = socketed_crossbow & foe.distance > lastFoeDistance + 2) & totaltime > startTimeR & range > 12
+   startTimeR = totaltime + 1
+  
+ ?totaltime >= startTimeR
+  ?foe.distance > range //在攻击距离外时预设置启动时间
+   startTimeR = totaltime + 1
+  :?lastPosZ ! pos.z //进行 z 轴移动时重置等待时间，因为无法判断 z 轴距离是否够武器攻击，相比打断动作，延后取消后摇的时间更好
+   lastPosZ = pos.z
+   startTimeR = totaltime
+
+ ?totaltime < startTimeR + preHitFrames & totaltime = startTimeR + preHitFrames - 1 & foe.count ! 0
+  cooldownEndFrameR = totaltime + 1 + cooldown
+  remainingCooldownR = 1 + cooldown
+ 
+ lastFoe = foe
+ lastFoeHp = foe.hp
+ lastFoeLevel = foe.level
+ lastFoeDistance = foe.distance
+
+//测量前摇与冷却，填入主手范围，即未装备在主手时 +1
+//找个不会被你一击秒杀、也不会在攻击两次期间减速你、打断你、让你的伤害变成 0 的敌人，推荐卫城守卫
+func Test(item)
+ ?totaltime < 50 //拿一段时间，消除可能存在的残留冷却
+  equip @item@
+ :?foe.distance > 11 //冲刺到脸上，不然测不了远程武器
+   equipL triskelion
+   equipR dashing shield
+ :
+  ?testStartTime = 0
+   equip @item@ //冲刺到脸上后换武器
+   testStartTime = totaltime + 1 //因为换了武器，所以有一帧启动延迟
+  ?foe.count > 0 & foe = lastFoe & (foe.hp < lastFoeHp | foe.armor < lastFoeArmor) & !isTestCooldownCompleted //敌人受到伤害
+   ?testPreHitFrames = 0 & !isTestPreHitFramesCompleted
+    testPreHitFrames = totaltime - testStartTime //测出前摇帧数
+    isTestPreHitFramesCompleted = 1
+   :
+    testcooldown = totaltime - testStartTime - 2*testPreHitFrames //测出冷却帧数
+    isTestCooldownCompleted = 1
+    loc.Pause() //暂停游戏
+  ?isTestPreHitFramesCompleted //测出前摇帧数时取消后摇进入冷却
+   ?item.right ! quarterstaff
+    equip quarterstaff
+   :
+    equipL sword
+    equipR shield
+   equip @item@
+
+ >`38,18,(@testPreHitFrames@,@testcooldown@)
+ >`29,19,(preHitFrames,cooldown)
+ lastFoe = foe
+ lastFoeHp =foe.hp
+ lastFoeArmor = foe.armor

@@ -3,5 +3,7 @@
 // 其他信息请见:StoneStoryRPG.com/stonescript.
 // ——贤者贝赛拉
 
-import https://StoneStoryRPG.com/stonescript/Cosmetics/PetBoo.txt
+?loc.begin
+  var shakeAfter1 = new ShakeAfter
+shakeAfter1.TH("re", 23, 0, 2)
 >外部脚本123
