@@ -7,6 +7,7 @@
 
 ?loc.begin
   var shakeAfter1 = new ShakeAfter
+  var shakeAfter2 = new ShakeAfter
   var showUI = false
   var allowBlade = true
   var next = true
@@ -19,6 +20,7 @@
       brew wood + bronze
 ?loc.loop
   shakeAfter1.loop()
+  shakeAfter2.loop()
   music.Stop()
   allowBlade = true
   next = true
@@ -348,7 +350,8 @@
           equipR ae sh *10 A +0
   :?foe.name = 炸弹推车
     ?!IsFoePoisoned()
-      equip po cr
+      shakeAfter2.TH('po cr', 23, 0, 2)
+      // equip po cr
     :
       equip re
   :
@@ -371,11 +374,11 @@
         :?IsMask(300)
           Mask()
         :
-          equip aether crossbow
-          // shakeAfter1.TH('ae cr', 22, 15 , 6)
+          // equip aether crossbow
+          shakeAfter1.TH('ae cr', 22, 15 , 6)
       :
-        equip aether crossbow
-        // shakeAfter1.TH('ae cr', 22, 15 , 6)
+        // equip aether crossbow
+        shakeAfter1.TH('ae cr', 22, 15 , 6)
     ?item.potion = Berserk potion & 
     ^foe.armor < 3500
       ?totaltime > 2400

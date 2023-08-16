@@ -371,11 +371,11 @@
         :?IsMask(300)
           Mask()
         :
-          equip aether crossbow
-          // shakeAfter1.TH('ae cr', 22, 15 , 6)
+          // equip aether crossbow
+          shakeAfter1.TH('ae cr', 22, 15 , 6)
       :
-        equip aether crossbow
-        // shakeAfter1.TH('ae cr', 22, 15 , 6)
+        // equip aether crossbow
+        shakeAfter1.TH('ae cr', 22, 15 , 6)
     ?item.potion = Berserk potion & 
     ^foe.armor < 3500
       ?totaltime > 2400
