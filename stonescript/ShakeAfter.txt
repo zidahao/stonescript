@@ -195,7 +195,7 @@ func TH(item,range,preHitFrames,cooldown) // 武器名, 武器距离, 前摇帧�
     equip Star Stone
     equip @item@
     startTimeTH = totaltime + cooldown
-    //>o-2,4,shake
+    >o-2,4,shake
   ://远程武器击杀/切换目标时会打断动作并进入一帧冷却，由于游戏没有给出足够的参数，无法 100% 精准判断
     ?kill = true & (foe ! lastFoe | foe.level ! lastFoeLevel | foe.hp > lastFoeHp | item.right = socketed_crossbow & foe.distance > lastFoeDistance + 2) & totaltime > startTimeTH & range > 12
       startTimeTH = totaltime + 1
