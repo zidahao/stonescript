@@ -2,14 +2,11 @@
 // 指令必须使用写入石之脚本.
 // 其他信息请见:StoneStoryRPG.com/stonescript.
 // ——贤者贝赛拉
-// ?loc.begin
-//   var shakeAfter1 = new ShakeAfter
-// ?loc.loop
-//   shakeAfter1.loop()
 // import Cosmetics/PetBoo
 //import Cosmetics/Hats/Skully
 
 ?loc.begin
+  var shakeAfter1 = new ShakeAfter
   var showUI = false
   var allowBlade = true
   var next = true
@@ -21,6 +18,7 @@
     ?loc = MINE
       brew wood + bronze
 ?loc.loop
+  shakeAfter1.loop()
   music.Stop()
   allowBlade = true
   next = true
