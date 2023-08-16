@@ -6,4 +6,4 @@
 ?loc.begin
   var shakeAfter1 = new ShakeAfter
 shakeAfter1.TH("re", 23, 0, 2)
->外部脚本123
+// >外部脚本123
