@@ -1,824 +1,825 @@
->123
-// // 意念之石启动之后,可以持续执行它所收到的指令.
-// // 指令必须使用写入石之脚本.
-// // 其他信息请见:StoneStoryRPG.com/stonescript.
-// // ——贤者贝赛拉
+// 意念之石启动之后,可以持续执行它所收到的指令.
+// 指令必须使用写入石之脚本.
+// 其他信息请见:StoneStoryRPG.com/stonescript.
+// ——贤者贝赛拉
 // ?loc.begin
 //   var shakeAfter1 = new ShakeAfter
 // ?loc.loop
 //   shakeAfter1.loop()
-// // import Cosmetics/PetBoo
-// //import Cosmetics/Hats/Skully
+// import Cosmetics/PetBoo
+//import Cosmetics/Hats/Skully
 
-// ?loc.begin
-//   var showUI = false
-//   var allowBlade = true
-//   var next = true
-//   var count = 0
-//   var pause = true
-//   ?item.potion = empty
-//     ?loc = forest
-//       brew wood
-//     ?loc = MINE
-//       brew wood + bronze
-// ?loc.loop
-//   music.Stop()
-//   allowBlade = true
-//   next = true
-//   count = 0
-//   pause = true
-// >`20,25,状态:@foe.state@
-// >`20,26,屏幕:@screen.i@
-// >`26,26,foes:@foe.count@
-// >`34,26,距离:@foe.distance@
-// >`26,25,time:@time.FormatCasual(totaltime,true)@
+?loc.begin
+  var showUI = false
+  var allowBlade = true
+  var next = true
+  var count = 0
+  var pause = true
+  ?item.potion = empty
+    ?loc = forest
+      brew wood
+    ?loc = MINE
+      brew wood + bronze
+?loc.loop
+  music.Stop()
+  allowBlade = true
+  next = true
+  count = 0
+  pause = true
+>`20,25,状态:@foe.state@
+>`20,26,屏幕:@screen.i@
+>`26,26,foes:@foe.count@
+>`34,26,距离:@foe.distance@
+>`26,25,time:@time.FormatCasual(totaltime,true)@
 
-// // 血量小于5时使用药水
-// // ?hp < 5
-// //  activate potion
-// ?foe.count > 25
-//   useBlade()
-// ?foe = immune_to_physical
-//   equip Vigor Staff*10
-// // 敌人是蚊子时
-// ?foe = mosquito
-//   equip re
-//   equip he
-//   equip re
-// // 岩石高地
-// ?loc = rocky
-//   //距离大于17时切换跑路配置
-//   //盾换成你自己能准备出来的盾
-//   ?foe.distance > 17
-//     equipL Triskelion Stone
-//     equipR Compound Shield
-//   //距离在11~17时切冲锋盾冲刺至近身
-//   :?foe.distance > 11
-//     equipL Triskelion Stone
-//     ?IsDash()
-//       equipR Dashing Shield
-//     :?IsBash()
-//       equipR Bashing Shield
-//     :
-//       equipR Compound Shield
-//   //距离小于11时进入近战模式
-//   :
-//     //对小boss和一阶段部分
-//     //黄5小boss伤害也就4,满星毒无附魔就没了.
-//     ?foe = acronian_scout |
-//     ^foe = dysangelos_bearer
-//       //巴迪什跳劈蹭伤害
-//       ?IsBardiche(500)
-//         Bardiche()
-//       :
-//         //左手功能为回血和输出.
-//         //小boss和一阶段是循环中适合回血的阶段.
-//         //自己修改回血线.
-//         ?hp < maxhp
-//           equipL Vigor Sword dL
-//         :
-//           equipL Fire Sword D
-//         //右手功能是上状态,这里是6冰1毒.
-//         //当你有富余的火D小剑,你可以在右手增加输出,
-//         //需要时自行修改逻辑.
-//         ?string.IndexOf(foe.debuffs.string, 
-//         ^＂damage＂) = -1
-//           equipR Poison Sword dP
-//         :
-//           equipR Ice Sword dI
+// 血量小于5时使用药水
+// ?hp < 5
+//  activate potion
+?foe.count > 25
+  useBlade()
+?foe = immune_to_physical
+  equip Vigor Staff*10
+// 敌人是蚊子时
+?foe = mosquito
+  equip re
+  equip he
+  equip re
+// 岩石高地
+?loc = rocky
+  //距离大于17时切换跑路配置
+  //盾换成你自己能准备出来的盾
+  ?foe.distance > 17
+    equipL Triskelion Stone
+    equipR Compound Shield
+  //距离在11~17时切冲锋盾冲刺至近身
+  :?foe.distance > 11
+    equipL Triskelion Stone
+    ?IsDash()
+      equipR Dashing Shield
+    :?IsBash()
+      equipR Bashing Shield
+    :
+      equipR Compound Shield
+  //距离小于11时进入近战模式
+  :
+    //对小boss和一阶段部分
+    //黄5小boss伤害也就4,满星毒无附魔就没了.
+    ?foe = acronian_scout |
+    ^foe = dysangelos_bearer
+      //巴迪什跳劈蹭伤害
+      ?IsBardiche(500)
+        Bardiche()
+      :
+        //左手功能为回血和输出.
+        //小boss和一阶段是循环中适合回血的阶段.
+        //自己修改回血线.
+        ?hp < maxhp
+          equipL Vigor Sword dL
+        :
+          equipL Fire Sword D
+        //右手功能是上状态,这里是6冰1毒.
+        //当你有富余的火D小剑,你可以在右手增加输出,
+        //需要时自行修改逻辑.
+        ?string.IndexOf(foe.debuffs.string, 
+        ^＂damage＂) = -1
+          equipR Poison Sword dP
+        :
+          equipR Ice Sword dI
  
-//     //二阶段部分
-//     //二阶段部分需要盯着弱点打,
-//     //否则会被上对应属性的debuff,影响效率.
-//     :?foe = dysangelos_elementalist
-//       //巴迪什跳劈蹭伤害,
-//       //有小概率会在跳劈的前摇中被boss攻击,
-//       //然后因为没有打弱点导致被挂debuff,
-//       //因此要确保跳劈过程中boss不会出手.
-//       ?IsBardiche(500) & foe.time < 25
-//         Bardiche()
+    //二阶段部分
+    //二阶段部分需要盯着弱点打,
+    //否则会被上对应属性的debuff,影响效率.
+    :?foe = dysangelos_elementalist
+      //巴迪什跳劈蹭伤害,
+      //有小概率会在跳劈的前摇中被boss攻击,
+      //然后因为没有打弱点导致被挂debuff,
+      //因此要确保跳劈过程中boss不会出手.
+      ?IsBardiche(500) & foe.time < 25
+        Bardiche()
    
-//       //配合上面的代码,不会被错误取消跳劈的动作.
-//       :?item.GetCooldown(＂bardiche＂) < 870
-//         //针对弱点换武器
-//         //请根据自己有的武器修改装备代码.
-//         //在资源富余的情况下可以双手同属性武器.
-//         //在没有两把同属性武器时,
-//         //推荐一手固定冰dI武器用于减速,
-//         //当然你也可以插入吸血武器的判断.
-//         ?foe = Poison
-//           equipL Ice Sword dI
-//           equipR Poison Sword dP Golden
-//         ?foe = Vigor
-//           equipL Poison Sword dP  Golden
-//           equipR Poison Sword dP -Golden
-//         ?foe = Aether
-//           equipL Ice Sword dI
-//           equipR Vigor Sword dL
-//         ?foe = Fire
-//           equipL Ice Sword dI
-//           equipR Aether Sword D
-//         ?foe = Ice
-//           equipL Fire Sword D  Golden
-//           equipR Fire Sword D -Golden
+      //配合上面的代码,不会被错误取消跳劈的动作.
+      :?item.GetCooldown(＂bardiche＂) < 870
+        //针对弱点换武器
+        //请根据自己有的武器修改装备代码.
+        //在资源富余的情况下可以双手同属性武器.
+        //在没有两把同属性武器时,
+        //推荐一手固定冰dI武器用于减速,
+        //当然你也可以插入吸血武器的判断.
+        ?foe = Poison
+          equipL Ice Sword dI
+          equipR Poison Sword dP Golden
+        ?foe = Vigor
+          equipL Poison Sword dP  Golden
+          equipR Poison Sword dP -Golden
+        ?foe = Aether
+          equipL Ice Sword dI
+          equipR Vigor Sword dL
+        ?foe = Fire
+          equipL Ice Sword dI
+          equipR Aether Sword D
+        ?foe = Ice
+          equipL Fire Sword D  Golden
+          equipR Fire Sword D -Golden
  
-//     //三阶段部分
-//     :?foe = dysangelos_perfected
-//       //巴迪什跳劈蹭伤害
-//       ?IsBardiche(500)
-//         Bardiche()
+    //三阶段部分
+    :?foe = dysangelos_perfected
+      //巴迪什跳劈蹭伤害
+      ?IsBardiche(500)
+        Bardiche()
 
-//       //大眼开盾的状态为32,并在时间为60时,
-//       //开盾同时攻击玩家造成眩晕.
-//       //32这个状态与其他动作状态重复,
-//       //因此需要额外条件来限定是开盾的准备状态.
-//       //这里用的是三阶段的time范围作为条件,
-//       //这个time的范围受到boss是否吃到减速的影响,
-//       //因此需要你自己测算然后重新填写time的范围.
-//       :?time > 600 & time < 700 
-//         //大眼开盾前上重锤技能挂debuff,减少盾量.
-//         ?foe.state = 32 & foe.time < 30
-//           equip Heavy Hammer +10
-//           activate R
+      //大眼开盾的状态为32,并在时间为60时,
+      //开盾同时攻击玩家造成眩晕.
+      //32这个状态与其他动作状态重复,
+      //因此需要额外条件来限定是开盾的准备状态.
+      //这里用的是三阶段的time范围作为条件,
+      //这个time的范围受到boss是否吃到减速的影响,
+      //因此需要你自己测算然后重新填写time的范围.
+      :?time > 600 & time < 700 
+        //大眼开盾前上重锤技能挂debuff,减少盾量.
+        ?foe.state = 32 & foe.time < 30
+          equip Heavy Hammer +10
+          activate R
 
-//         //在开盾前一刻后撤闪避攻击,防被晕.
-//         //因为不同玩家的冰debuff持续状况可能不同,
-//         //请根据自己实际情况调整foe.time比对的值.
-//         :?foe.state = 32 & foe.time = 59
-//           equipR Mind Stone
+        //在开盾前一刻后撤闪避攻击,防被晕.
+        //因为不同玩家的冰debuff持续状况可能不同,
+        //请根据自己实际情况调整foe.time比对的值.
+        :?foe.state = 32 & foe.time = 59
+          equipR Mind Stone
 
-//         //时间范围内其余时间挂冰以尽量减少误差
-//         :
-//           ?hp < maxhp
-//             equipL Vigor Sword dL
-//           :
-//             equipL Fire Sword D
-//           equipR Ice Sword dI
+        //时间范围内其余时间挂冰以尽量减少误差
+        :
+          ?hp < maxhp
+            equipL Vigor Sword dL
+          :
+            equipL Fire Sword D
+          equipR Ice Sword dI
 
-//       //这是躲大眼激光的部分
-//       //注意,如果距离躲开盾攻击的时间太短,
-//       //此时意念石有可能会在cd中.
-//       //当然也有可能,你见不到激光就打完了.
-//       :?foe.state = 115 & foe.time = 76
-//         equipR Mind Stone
-//       :
-//         //大眼三阶段有个特殊机制,
-//         //在他开盾后会给自己上个抗性buff,
-//         //抵抗在三阶段开盾前受到最多伤害的属性,
-//         //这里开盾前主用火打,开盾后换其他即可.
+      //这是躲大眼激光的部分
+      //注意,如果距离躲开盾攻击的时间太短,
+      //此时意念石有可能会在cd中.
+      //当然也有可能,你见不到激光就打完了.
+      :?foe.state = 115 & foe.time = 76
+        equipR Mind Stone
+      :
+        //大眼三阶段有个特殊机制,
+        //在他开盾后会给自己上个抗性buff,
+        //抵抗在三阶段开盾前受到最多伤害的属性,
+        //这里开盾前主用火打,开盾后换其他即可.
 
-//         //左手开盾前莽火伤害,开盾后回血和输出.
-//         ?time >= 700
-//           ?hp < maxhp
-//             equipL Vigor Sword dL
-//           :
-//             equipL Aether Sword D
-//         :
-//           equipL Fire Sword D
+        //左手开盾前莽火伤害,开盾后回血和输出.
+        ?time >= 700
+          ?hp < maxhp
+            equipL Vigor Sword dL
+          :
+            equipL Aether Sword D
+        :
+          equipL Fire Sword D
 
-//         //右手一直挂冰
-//         equipR Ice Sword dI
-// // 枯木峡谷
-// ?loc = canyon
-//   ?(totaltime > 230 & screen.i < 2) | 
-//   ^(totaltime > 360 & screen.i < 3) | 
-//   ^(totaltime > 500 & screen.i < 4) |
-//   ^(totaltime > 630 & screen.i < 5) |
-//   ^(hp < 79 & loc.stars = 8)
-//     loc.Leave()
-//  // ?harvest.distance <10
-//  //  equip hatchet
-//   ?foe ! boss
-//     ?foe = immune_to_ranged
-//       equipL Big ae Sword *10
-//       equipR ae sh
-//       ?EnoughDistance()
-//         ?IsDash()
-//           equipR dash
-//         :?IsBash()
-//           equipR bash
-//       ?foe.count > 10
-//         useBlade()
-//     :
-//       equip re
-//       equip he
-//       equip re
-//  :
-//    music.Play(temple_0)
-//    ?foe.name!Punishment & foe.name!惩戒夫人珀伊纳
-//      equip he
-//      ?foe.hp < 200
-//        equip re
-//        equip he
-//        equip re
-//    :
-//      equip re
-//      equip he
-//      equip re
-//      ?foe.state = 33 & foe.time > 10
-//        ?foe.distance > 10
-//          equipL ri
-//          ?IsDash()
-//            equipR dash
-//          :?IsBash()
-//            equipR bash
-//      :
-//        equip re
-//      ?IsBardiche(200)
-//        Bardiche()
-//      ?foe.state = 1 & foe.time > 75 & 
-//      ^getCool(mind) <= 0
-//        equipR mind
-// // 恐怖洞窟
-// ?loc = fear
-//   ?totaltime = 375 & foe.distance!9999 & 
-//   ^loc.stars = 5
-//     loc.leave()
-//   ?foe.count > 15
-//     useBlade()
-//   ?foe!boss
-//     equip po re
-//     equip he
-//     equip re
-//   :
-//     ?IsBardiche(50)
-//       Bardiche()
-//     :?getCool(＂bardiche＂) <= 0
-//       equipL ri
-//       ?IsBash()
-//         equipR bash
-//       :?IsDash()
-//         equipR dash
-//     :
-//       equip repeating crossbow
-// // 蘑菇森林
-// ?loc = forest
-//   ?item.potion = empty&buffs.count<1
-//     loc.Leave()
-//   ?item.potion = Experience potion & 
-//   ^totaltime > 120 & totaltime < 150
-//     activate potion
-//   ?next
-//     screen.next()
-//   ?foe.count > 15
-//     useBlade()
-//   ?foe!boss
-//     ?foe.state > 2
-//       equipR ae sh
-//     :
-//       equipR po sh *10
-//     ?foe.count < 3 & foe.name = 蚂蚁
-//       equip re
-//       equipL ae
-//     ?buffs.count > 15
-//       equipL big po sw
-//     ?foe.distance > 17
-//       equipL ri
-//     ?IsDash()
-//       equipR dash
-//     :?IsBash()
-//       equipR bash
-//   :
-//     ?foe.name = 毛毛
-//       equipL ae
-//       equipR a
-//     :?foe.name = 超大蜗牛
-//       ?IsBardiche(100)
-//         Bardiche()
-//       :
-//         equipL big po sw*10
-//         equipR a
-//     :?IsBardiche(300)
-//       Bardiche()
-//     :?IsMask(300)
-//       Mask()
-//     :
-//       equipL big po sw*10
-//       ?foe.name=孢兄羊肚君
-//         ?IsHammer()&foe.armor>0
-//           Hammer()
-//         :
-//           equipL po ham *10 D
-//           equipR ai
-//       :
-//         equipR mask
-//       ?foe.distance>17
-//         equipL ri
-//       ?IsDash()
-//         equipR dash
-//       :?IsBash()
-//         equipR bash
-// // 亡者之殿
-// ?loc = undead_crypt
-//  equip vigor staff*10
-//  //?foe = boss
-//  // equip po re
-//   //equip vi cr
-// // 矿井
-// ?loc = MINE
-//   ?(totaltime > 1170 & screen.i = 0 & pause) |
-//   ^(hp < maxhp)
-//     loc.Leave()
-//     pause = false
-//   ?foe=boss &foe.hp > 50 &totaltime>2700
-//     loc.Pause()
-//   ?screen.i=3 & IsBlade(5)
-//     Blade()
-//   :?foe!boss
-//     ?foe.distance > 17
-//       equipL ri
-//       equipR ae sh +0
-//     :?foe.distance > 11
-//       ?buffs.count > 21
-//         equipL po sw
-//       :
-//         equipL ae sw
-//       ?IsDash()
-//         equipR dash
-//       :?IsBash()
-//         equipR bash
-//       :
-//         equipR ae sh *10 +0
-//     :
-//       ?buffs.count > 21
-//         equipL po sw +6
-//         equipR ai
-//       :
-//         equipL ae sw
-//         ?foe.state > 2
-//           equipR ae sh
-//         :
-//           equipR ae sh *10 A +0
-//   :?foe.name = 炸弹推车
-//     ?!IsFoePoisoned()
-//       equip po cr
-//     :
-//       equip re
-//   :
-//     >@count/14@
-//     ?count >= 56 & foe.state =32&foe.time>= 40
-//       loc.Leave()
-//     ?IsHammer()&foe.armor > 0
-//       Hammer()
-//       count++
-//     :
-//       ?foe.state = 33
-//         ?IsBardiche(300)
-//           Bardiche()
-//         :?getCool(＂bardiche＂) <= 0
-//           equipL ri
-//           ?IsBash()
-//             equipR bash
-//           :?IsDash()
-//             equipR dash
-//         :?IsMask(300)
-//           Mask()
-//         :
-//           shakeAfter1.TH('ae cr', 22, 15 , 6)
-//       :
-//         shakeAfter1.TH('ae cr', 22, 15 , 6)
-//     ?item.potion = Berserk potion & 
-//     ^foe.armor < 3500
-//       ?totaltime > 2400
-//         loc.Leave()
-//       :
-//         activate potion
-//     ?foe.state = 32 & foe.time = 20
-//       equipR min
-// // 不融山
-// ?loc = icy
-//   ?foe!boss
-//     ?foe.distance > 11
-//       equipL Triskelion Stone
-//       ?IsDash()
-//         equipR Dashing Shield
-//       :?IsBash()
-//         equipR Bashing Shield
-//       :
-//         equipR aether Shield
-//     :
-//       equipR aether Shield
-//       ?foe.maxhp < 90
-//         equipL fire sword +7
-//       :
-//         equipL aether sword
-//   :?IsBardiche(1500)
-//     Bardiche()
-//   :
-//     ?foe.distance > 5
-//       ?foe.distance > 11
-//         equipL Triskelion Stone
-//       :
-//         equipL fire sword
-//       ?IsDash()
-//         equipR Dashing Shield
-//       :?IsBash()
-//         equipR Bashing Shield
-//       :
-//         ?hp < maxhp
-//           equipR vigor Shield
-//         :
-//           equipR fire Shield
-//     :
-//       equipL Fire Sword D Golden
-//       ?hp < maxhp
-//         equipR vigor shield
-//       :
-//         equipR Fire Sword D -Golden
-// // 神庙
-// ?loc = temple
-//  ?foe!boss
-//   equipL ae
-//   equipR ic
-//   ?foe.state > 2
-//    equipR a
-//   ?foe.distance < 17 & foe.distance > 6
-//    equipR dash
-//   ?foe.distance > 24 & hp >= maxhp
-//    equipL ri
-//  ?foe = boss
-//   ?totaltime = 3600
-//    loc.pause()
-//   ?foe.hp < 300
-//    loc.pause()
-//   ?foe.debuffs.count = 0
-//    equip po cr
-//   :
-//    equip he
-//    ?foe.state
-//     ?foe.distance < 10 & getCool(mind)
-//      equipR mind
-//     ?foe.distance < 17
-//      equipR ba
-//     ?foe.distance < 24
-//      equipL ri
-//    ?IsBardiche(300)
-//     Bardiche()
-// /*
-// >@foe.distance@__@getCool(＂skeleton_arm＂)@__
-// ^@totaltime@__@item.canActivate(＂skeleton_arm＂)
-// ^@@SkeletonR()@
-// ?!SkeletonR()
-//   ?foe=boss
-//     ?IsBardiche(300)
-//       Bardiche()
-//     :?getCool(＂bardiche＂) > 0
-//       equip re
-//     :
-//       ?foe.distance > 17
-//         equipL ri
-//       ?IsDash()
-//         equipR dash
-//       :?IsBash()
-//         equipR bash
-//   :
-//     equipL ae
-//     equipR a
-//     ?foe.distance > 17
-//       equipL ri
-//     ?IsDash()
-//       equipR dash
-//     :?IsBash()
-//       equipR bash
-// */
-//  /*
-//  敌人不为boss距离大于22或为boss距离大于35
-//  有扣血时装备衔尾蛇 反之装备三曲腿增加移速
-//  */
-// // ?(foe!boss & foe.distance > 22)
-// // ^|(foe = boss & foe.distance > 35)
-// ?(foe.state = -1|foe.state = 0|foe.state = 1) &
-// ^((foe!boss & foe.distance > 18) | 
-// ^(foe = boss & foe.distance > 19))
-//   ?hp < maxhp | IsQuart()=False
-//     ?hp < maxhp
-//       equipL ouroboros
-//     :
-//       equipL ri stone
-//     ?buffs.count>=20
-//       equipR mask
-//     :?foe = poison
-//       equipR Ice Shield
-//     :?foe = vigor
-//       equipR Poison Shield
-//     :?foe = aether
-//       equipR Vigor Shield *10
-//     :?foe = fire
-//       equipR Aether Shield
-//     :?foe = ice
-//       equipR Fire Shield*10
-//   :
-//     Quart()
-// /*>屏幕:@screen.i@目前时间@totaltime/30@秒
-// ^敌人的距离:@foe.distance@
-// ^敌人数量:@foe.count@敌人的状态:
-// ^@foe.state@敌人的伤害@foe.damage@*/
-// ?pickup.distance < 15
-//  equipL star
+        //右手一直挂冰
+        equipR Ice Sword dI
+// 枯木峡谷
+?loc = canyon
+  ?(totaltime > 230 & screen.i < 2) | 
+  ^(totaltime > 360 & screen.i < 3) | 
+  ^(totaltime > 500 & screen.i < 4) |
+  ^(totaltime > 630 & screen.i < 5) |
+  ^(hp < 79 & loc.stars = 8)
+    loc.Leave()
+ // ?harvest.distance <10
+ //  equip hatchet
+  ?foe ! boss
+    ?foe = immune_to_ranged
+      equipL Big ae Sword *10
+      equipR ae sh
+      ?EnoughDistance()
+        ?IsDash()
+          equipR dash
+        :?IsBash()
+          equipR bash
+      ?foe.count > 10
+        useBlade()
+    :
+      equip re
+      equip he
+      equip re
+ :
+   music.Play(temple_0)
+   ?foe.name!Punishment & foe.name!惩戒夫人珀伊纳
+     equip he
+     ?foe.hp < 200
+       equip re
+       equip he
+       equip re
+   :
+     equip re
+     equip he
+     equip re
+     ?foe.state = 33 & foe.time > 10
+       ?foe.distance > 10
+         equipL ri
+         ?IsDash()
+           equipR dash
+         :?IsBash()
+           equipR bash
+     :
+       equip re
+     ?IsBardiche(200)
+       Bardiche()
+     ?foe.state = 1 & foe.time > 75 & 
+     ^getCool(mind) <= 0
+       equipR mind
+// 恐怖洞窟
+?loc = fear
+  ?totaltime = 375 & foe.distance!9999 & 
+  ^loc.stars = 5
+    loc.leave()
+  ?foe.count > 15
+    useBlade()
+  ?foe!boss
+    equip po re
+    equip he
+    equip re
+  :
+    ?IsBardiche(50)
+      Bardiche()
+    :?getCool(＂bardiche＂) <= 0
+      equipL ri
+      ?IsBash()
+        equipR bash
+      :?IsDash()
+        equipR dash
+    :
+      equip repeating crossbow
+// 蘑菇森林
+?loc = forest
+  ?item.potion = empty&buffs.count<1
+    loc.Leave()
+  ?item.potion = Experience potion & 
+  ^totaltime > 120 & totaltime < 150
+    activate potion
+  ?next
+    screen.next()
+  ?foe.count > 15
+    useBlade()
+  ?foe!boss
+    ?foe.state > 2
+      equipR ae sh
+    :
+      equipR po sh *10
+    ?foe.count < 3 & foe.name = 蚂蚁
+      equip re
+      equipL ae
+    ?buffs.count > 15
+      equipL big po sw
+    ?foe.distance > 17
+      equipL ri
+    ?IsDash()
+      equipR dash
+    :?IsBash()
+      equipR bash
+  :
+    ?foe.name = 毛毛
+      equipL ae
+      equipR a
+    :?foe.name = 超大蜗牛
+      ?IsBardiche(100)
+        Bardiche()
+      :
+        equipL big po sw*10
+        equipR a
+    :?IsBardiche(300)
+      Bardiche()
+    :?IsMask(300)
+      Mask()
+    :
+      equipL big po sw*10
+      ?foe.name=孢兄羊肚君
+        ?IsHammer()&foe.armor>0
+          Hammer()
+        :
+          equipL po ham *10 D
+          equipR ai
+      :
+        equipR mask
+      ?foe.distance>17
+        equipL ri
+      ?IsDash()
+        equipR dash
+      :?IsBash()
+        equipR bash
+// 亡者之殿
+?loc = undead_crypt
+ equip vigor staff*10
+ //?foe = boss
+ // equip po re
+  //equip vi cr
+// 矿井
+?loc = MINE
+  ?(totaltime > 1170 & screen.i = 0 & pause) |
+  ^(hp < maxhp)
+    loc.Leave()
+    pause = false
+  ?foe=boss &foe.hp > 50 &totaltime>2700
+    loc.Pause()
+  ?screen.i=3 & IsBlade(5)
+    Blade()
+  :?foe!boss
+    ?foe.distance > 17
+      equipL ri
+      equipR ae sh +0
+    :?foe.distance > 11
+      ?buffs.count > 21
+        equipL po sw
+      :
+        equipL ae sw
+      ?IsDash()
+        equipR dash
+      :?IsBash()
+        equipR bash
+      :
+        equipR ae sh *10 +0
+    :
+      ?buffs.count > 21
+        equipL po sw +6
+        equipR ai
+      :
+        equipL ae sw
+        ?foe.state > 2
+          equipR ae sh
+        :
+          equipR ae sh *10 A +0
+  :?foe.name = 炸弹推车
+    ?!IsFoePoisoned()
+      equip po cr
+    :
+      equip re
+  :
+    >@count/14@
+    ?count >= 56 & foe.state =32&foe.time>= 40
+      loc.Leave()
+    ?IsHammer()&foe.armor > 0
+      Hammer()
+      count++
+    :
+      ?foe.state = 33
+        ?IsBardiche(300)
+          Bardiche()
+        :?getCool(＂bardiche＂) <= 0
+          equipL ri
+          ?IsBash()
+            equipR bash
+          :?IsDash()
+            equipR dash
+        :?IsMask(300)
+          Mask()
+        :
+          equip aether crossbow
+          // shakeAfter1.TH('ae cr', 22, 15 , 6)
+      :
+        equip aether crossbow
+        // shakeAfter1.TH('ae cr', 22, 15 , 6)
+    ?item.potion = Berserk potion & 
+    ^foe.armor < 3500
+      ?totaltime > 2400
+        loc.Leave()
+      :
+        activate potion
+    ?foe.state = 32 & foe.time = 20
+      equipR min
+// 不融山
+?loc = icy
+  ?foe!boss
+    ?foe.distance > 11
+      equipL Triskelion Stone
+      ?IsDash()
+        equipR Dashing Shield
+      :?IsBash()
+        equipR Bashing Shield
+      :
+        equipR aether Shield
+    :
+      equipR aether Shield
+      ?foe.maxhp < 90
+        equipL fire sword +7
+      :
+        equipL aether sword
+  :?IsBardiche(1500)
+    Bardiche()
+  :
+    ?foe.distance > 5
+      ?foe.distance > 11
+        equipL Triskelion Stone
+      :
+        equipL fire sword
+      ?IsDash()
+        equipR Dashing Shield
+      :?IsBash()
+        equipR Bashing Shield
+      :
+        ?hp < maxhp
+          equipR vigor Shield
+        :
+          equipR fire Shield
+    :
+      equipL Fire Sword D Golden
+      ?hp < maxhp
+        equipR vigor shield
+      :
+        equipR Fire Sword D -Golden
+// 神庙
+?loc = temple
+ ?foe!boss
+  equipL ae
+  equipR ic
+  ?foe.state > 2
+   equipR a
+  ?foe.distance < 17 & foe.distance > 6
+   equipR dash
+  ?foe.distance > 24 & hp >= maxhp
+   equipL ri
+ ?foe = boss
+  ?totaltime = 3600
+   loc.pause()
+  ?foe.hp < 300
+   loc.pause()
+  ?foe.debuffs.count = 0
+   equip po cr
+  :
+   equip he
+   ?foe.state
+    ?foe.distance < 10 & getCool(mind)
+     equipR mind
+    ?foe.distance < 17
+     equipR ba
+    ?foe.distance < 24
+     equipL ri
+   ?IsBardiche(300)
+    Bardiche()
+/*
+>@foe.distance@__@getCool(＂skeleton_arm＂)@__
+^@totaltime@__@item.canActivate(＂skeleton_arm＂)
+^@@SkeletonR()@
+?!SkeletonR()
+  ?foe=boss
+    ?IsBardiche(300)
+      Bardiche()
+    :?getCool(＂bardiche＂) > 0
+      equip re
+    :
+      ?foe.distance > 17
+        equipL ri
+      ?IsDash()
+        equipR dash
+      :?IsBash()
+        equipR bash
+  :
+    equipL ae
+    equipR a
+    ?foe.distance > 17
+      equipL ri
+    ?IsDash()
+      equipR dash
+    :?IsBash()
+      equipR bash
+*/
+ /*
+ 敌人不为boss距离大于22或为boss距离大于35
+ 有扣血时装备衔尾蛇 反之装备三曲腿增加移速
+ */
+// ?(foe!boss & foe.distance > 22)
+// ^|(foe = boss & foe.distance > 35)
+?(foe.state = -1|foe.state = 0|foe.state = 1) &
+^((foe!boss & foe.distance > 18) | 
+^(foe = boss & foe.distance > 19))
+  ?hp < maxhp | IsQuart()=False
+    ?hp < maxhp
+      equipL ouroboros
+    :
+      equipL ri stone
+    ?buffs.count>=20
+      equipR mask
+    :?foe = poison
+      equipR Ice Shield
+    :?foe = vigor
+      equipR Poison Shield
+    :?foe = aether
+      equipR Vigor Shield *10
+    :?foe = fire
+      equipR Aether Shield
+    :?foe = ice
+      equipR Fire Shield*10
+  :
+    Quart()
+/*>屏幕:@screen.i@目前时间@totaltime/30@秒
+^敌人的距离:@foe.distance@
+^敌人数量:@foe.count@敌人的状态:
+^@foe.state@敌人的伤害@foe.damage@*/
+?pickup.distance < 15
+ equipL star
 
-// func IsBlade(count)
-//   ?getCool(＂blade＂) <= 0 & 
-//   ^item.CanActivate() & 
-//   ^foe.count >= count
-//     screen.next()
-//     return foe.distance < 10
-//   :
-//     return false
-// func Blade()
-//   equip blade
-//   activate R
-//   next = false
-//   screen.resetOffset()
+func IsBlade(count)
+  ?getCool(＂blade＂) <= 0 & 
+  ^item.CanActivate() & 
+  ^foe.count >= count
+    screen.next()
+    return foe.distance < 10
+  :
+    return false
+func Blade()
+  equip blade
+  activate R
+  next = false
+  screen.resetOffset()
  
-// func useBlade()
-//  ?allowBlade
-//   ?getCool(＂blade＂) <= 0
-//    ?foe.distance <= 30
-//     equip blade
-//     activate R
-//     allowBlade = false
-//     next = false
-//     screen.resetOffset()
+func useBlade()
+ ?allowBlade
+  ?getCool(＂blade＂) <= 0
+   ?foe.distance <= 30
+    equip blade
+    activate R
+    allowBlade = false
+    next = false
+    screen.resetOffset()
 
-// func IsBardiche(a)
-//  ?(getCool(＂bardiche＂) > 870 | 
-//   ^getCool(＂bardiche＂) <= 0) &
-//   ^item.CanActivate() & 
-//   ^foe.distance < 10 & 
-//   ^foe.hp+foe.armor >= a
-//   return true
-//  :
-//   return false
+func IsBardiche(a)
+ ?(getCool(＂bardiche＂) > 870 | 
+  ^getCool(＂bardiche＂) <= 0) &
+  ^item.CanActivate() & 
+  ^foe.distance < 10 & 
+  ^foe.hp+foe.armor >= a
+  return true
+ :
+  return false
 
-// func Bardiche()
-//  equip Bardiche
-//  activate R
+func Bardiche()
+ equip Bardiche
+ activate R
 
-// func IsQuart()
-//   ?getCool(＂quarterstaff＂) <= 0 &
-//   ^item.CanActivate()
-//     return True
-//   :
-//     return False
+func IsQuart()
+  ?getCool(＂quarterstaff＂) <= 0 &
+  ^item.CanActivate()
+    return True
+  :
+    return False
 
-// func Quart()
-//   equip quart *0
-//   activate R
+func Quart()
+  equip quart *0
+  activate R
 
-// func EnoughDistance()
-//   ?foe.distance <= 17 & foe.distance >= 11
-//     return true
-//   :
-//     return false
+func EnoughDistance()
+  ?foe.distance <= 17 & foe.distance >= 11
+    return true
+  :
+    return false
 
-// func IsDash()
-//   ?getCool(＂dash＂) <= 0 & EnoughDistance()
-//     return true
-//   :
-//     return false
+func IsDash()
+  ?getCool(＂dash＂) <= 0 & EnoughDistance()
+    return true
+  :
+    return false
 
-// func IsBash()
-//   ?getCool(＂bash＂) <= 0 & EnoughDistance()
-//     return true
-//   :
-//     return false
+func IsBash()
+  ?getCool(＂bash＂) <= 0 & EnoughDistance()
+    return true
+  :
+    return false
 
-// func IsHammer()
-//   ?(getCool(＂hammer＂) <= 0 |
-//   ^getCool(＂hammer＂) > 646) &
-//   ^item.CanActivate() &
-//   ^foe.distance < 21
-//     return true
-//   :
-//     return false
+func IsHammer()
+  ?(getCool(＂hammer＂) <= 0 |
+  ^getCool(＂hammer＂) > 646) &
+  ^item.CanActivate() &
+  ^foe.distance < 21
+    return true
+  :
+    return false
 
-// func Hammer()
-//   equip heavy hammer
-//   activate R
+func Hammer()
+  equip heavy hammer
+  activate R
 
-// func SkeletonR()
-//   ?item.GetCooldown(＂skeleton_arm＂) <= 0 & 
-//   ^foe.hp + foe.armor <= 32
-//     equip skeleton arm
-//     ?item.CanActivate(＂skeleton_arm＂)
-//       activate R
-//     return true
-//   :
-//     return false
+func SkeletonR()
+  ?item.GetCooldown(＂skeleton_arm＂) <= 0 & 
+  ^foe.hp + foe.armor <= 32
+    equip skeleton arm
+    ?item.CanActivate(＂skeleton_arm＂)
+      activate R
+    return true
+  :
+    return false
 
-// func IsMask(a)
-//   ?(getCool(＂mask＂) <= 0 ) &
-//   ^item.CanActivate() &
-//   ^buffs.count > 20 & 
-//   ^foe.hp+foe.armor >= a
-//     return true
-//   :
-//     return false
+func IsMask(a)
+  ?(getCool(＂mask＂) <= 0 ) &
+  ^item.CanActivate() &
+  ^buffs.count > 20 & 
+  ^foe.hp+foe.armor >= a
+    return true
+  :
+    return false
 
-// func Mask()
-//   equipR mask
-//   activate R
-// // > @getCool(bardiche)@
+func Mask()
+  equipR mask
+  activate R
+// > @getCool(bardiche)@
 
-// // 获取冷却时间
-// func getCool(str)
-//   return item.getCooldown(str)
+// 获取冷却时间
+func getCool(str)
+  return item.getCooldown(str)
 
-// // 是否有毒debuff
-// func IsFoePoisoned()
-//   ?foe.debuffs.string = debuff_damage
-//     return true
-//   :
-//     return false
+// 是否有毒debuff
+func IsFoePoisoned()
+  ?foe.debuffs.string = debuff_damage
+    return true
+  :
+    return false
 
-// // 是否有火debuff
-// func IsFoeFired()
-//   ?foe.debuffs.string = debuff_dot
-//     return true
-//   :
-//     return false
+// 是否有火debuff
+func IsFoeFired()
+  ?foe.debuffs.string = debuff_dot
+    return true
+  :
+    return false
 
-// // 是否有毒debuff
-// func IsFoeIced()
-//   ?foe.debuffs.string = debuff_chill
-//     return true
-//   :
-//     return false
-
-
-
-// //CDTime Window
-
-// var CDWindowCHS = ascii
-// ╔═══ 冷却时间 药水 ═══╗
-// ║药水             ║
-// ║巴迪什     斧头     ║
-// ║冲锋盾     冲撞盾    ║
-// ║意念石     重锤     ║
-// ║时间             ║
-// ║状态      距离     ║
-// ║帧       屏幕     ║
-// asciiend
-
-// var BFWindowCHS = ascii
-// ║堕神剑         >  ║
-// asciiend
-
-// var SKAWindowCHS = ascii
-// ║骷髅手         =  ║
-// asciiend
-
-// var MaskWindowCHS = ascii
-// ║蛇面具            ║
-// asciiend
-
-// var CDWindowEnd = ascii
-// ╚═══════════════╝
-// asciiend
-
-// var potionInfo = ＂＂
-// //CDTime
+// 是否有毒debuff
+func IsFoeIced()
+  ?foe.debuffs.string = debuff_chill
+    return true
+  :
+    return false
 
 
-// func CDTimeShowCHS(posX, posY,ifBF,ifSKA,ifMask)
-//   ?loc ! uulaa & loc ! undead_crypt_intro
-//     ?posX < 0
-//       posX = posX + screen.w
-//     ?posY < 0
-//       posY = posY + screen.h
-//     >`@posX@,@posY@,#white,@CDWindowCHS@
+
+//CDTime Window
+
+var CDWindowCHS = ascii
+╔═══ 冷却时间 药水 ═══╗
+║药水             ║
+║巴迪什     斧头     ║
+║冲锋盾     冲撞盾    ║
+║意念石     重锤     ║
+║时间             ║
+║状态      距离     ║
+║帧       屏幕     ║
+asciiend
+
+var BFWindowCHS = ascii
+║堕神剑         >  ║
+asciiend
+
+var SKAWindowCHS = ascii
+║骷髅手         =  ║
+asciiend
+
+var MaskWindowCHS = ascii
+║蛇面具            ║
+asciiend
+
+var CDWindowEnd = ascii
+╚═══════════════╝
+asciiend
+
+var potionInfo = ＂＂
+//CDTime
+
+
+func CDTimeShowCHS(posX, posY,ifBF,ifSKA,ifMask)
+  ?loc ! uulaa & loc ! undead_crypt_intro
+    ?posX < 0
+      posX = posX + screen.w
+    ?posY < 0
+      posY = posY + screen.h
+    >`@posX@,@posY@,#white,@CDWindowCHS@
       
-//     ?loc.begin | loc.loop
-//       potionInfo = getPotionInfoCHS()
-//     ?item.potion ! Empty 
-//       >`@posX+4@,@posY+1@,#00BFFF,@potionInfo@
-//     :?item.potion = Empty 
-//       >`@posX+4@,@posY+1@,#7f7f7f,@potionInfo@
+    ?loc.begin | loc.loop
+      potionInfo = getPotionInfoCHS()
+    ?item.potion ! Empty 
+      >`@posX+4@,@posY+1@,#00BFFF,@potionInfo@
+    :?item.potion = Empty 
+      >`@posX+4@,@posY+1@,#7f7f7f,@potionInfo@
 
-//     cooldownShowCHS(＂bardiche＂,posX+4,posY+2)
-//     // cooldownShowCHS(＂hatchet＂,posX+12,posY+2)
-//     // cooldownShowCHS(＂dash＂,posX+4,posY+3)
-//     // cooldownShowCHS(＂bash＂,posX+12,posY+3)
-//     // cooldownShowCHS(＂mind＂,posX+4,posY+4)
-//     // cooldownShowCHS(＂hammer＂,posX+12,posY+4)
+    cooldownShowCHS(＂bardiche＂,posX+4,posY+2)
+    // cooldownShowCHS(＂hatchet＂,posX+12,posY+2)
+    // cooldownShowCHS(＂dash＂,posX+4,posY+3)
+    // cooldownShowCHS(＂bash＂,posX+12,posY+3)
+    // cooldownShowCHS(＂mind＂,posX+4,posY+4)
+    // cooldownShowCHS(＂hammer＂,posX+12,posY+4)
 
-//     >`@posX+4@,@posY+5@,#white,
-//     ^@time.FormatCasual(totaltime, true)@
-//     >`@posX+4@,@posY+6@,#white,
-//     ^@foe.state@/@foe.time@
-//     >`@posX+12@,@posY+6@,#white,
-//     ^@foe.distance@
-//     >`@posX+4@,@posY+7@,#white,
-//     ^@totaltime@
-//     >`@posX+12@,@posY+7@,#white,
-//     ^@screen.i@
+    >`@posX+4@,@posY+5@,#white,
+    ^@time.FormatCasual(totaltime, true)@
+    >`@posX+4@,@posY+6@,#white,
+    ^@foe.state@/@foe.time@
+    >`@posX+12@,@posY+6@,#white,
+    ^@foe.distance@
+    >`@posX+4@,@posY+7@,#white,
+    ^@totaltime@
+    >`@posX+12@,@posY+7@,#white,
+    ^@screen.i@
 
-//     var showNum = 1
-//     ?ifBF = True
-//       >`@posX@,@posY+7+showNum@,#white,
-//       ^@BFWindowCHS@
-//       BFcooldownShowCHS(＂blade＂,posX+4,
-//       ^posY+7+showNum,10)
-//       showNum++
-//     ?ifSKA = True
-//       >`@posX@,@posY+7+showNum@,#white,
-//       ^@SKAWindowCHS@
-//       SKAcooldownShowCHS(＂skeleton_arm＂,
-//       ^posX+4,posY+7+showNum,3)
-//       showNum++
-//     ?ifMask = True
-//       >`@posX@,@posY+7+showNum@,#white,
-//       ^@MaskWindowCHS@
-//       MaskcooldownShowCHS(＂mask＂,posX+4,
-//       ^posY+7+showNum)
-//       showNum++
-//     >`@posX@,@posY+7+showNum@,#white,
-//     ^@CDWindowEnd@
+    var showNum = 1
+    ?ifBF = True
+      >`@posX@,@posY+7+showNum@,#white,
+      ^@BFWindowCHS@
+      BFcooldownShowCHS(＂blade＂,posX+4,
+      ^posY+7+showNum,10)
+      showNum++
+    ?ifSKA = True
+      >`@posX@,@posY+7+showNum@,#white,
+      ^@SKAWindowCHS@
+      SKAcooldownShowCHS(＂skeleton_arm＂,
+      ^posX+4,posY+7+showNum,3)
+      showNum++
+    ?ifMask = True
+      >`@posX@,@posY+7+showNum@,#white,
+      ^@MaskWindowCHS@
+      MaskcooldownShowCHS(＂mask＂,posX+4,
+      ^posY+7+showNum)
+      showNum++
+    >`@posX@,@posY+7+showNum@,#white,
+    ^@CDWindowEnd@
 
 
 
-// func BFbuffCount()
-//   var smiteCount = 0
-//   ?buffs.count > 0
-//     ?string.IndexOf(buffs.string,smite) > 0
-//       smiteCount = string.Sub(buffs.string, 
-//       ^string.IndexOf(buffs.string,smite) + 6,4)
-//       smiteCount = string.Sub(smiteCount, 0, 
-//       ^string.IndexOf(smiteCount,＂:＂))
-//       smiteCount = int.parse(smiteCount)
-//   return smiteCount
+func BFbuffCount()
+  var smiteCount = 0
+  ?buffs.count > 0
+    ?string.IndexOf(buffs.string,smite) > 0
+      smiteCount = string.Sub(buffs.string, 
+      ^string.IndexOf(buffs.string,smite) + 6,4)
+      smiteCount = string.Sub(smiteCount, 0, 
+      ^string.IndexOf(smiteCount,＂:＂))
+      smiteCount = int.parse(smiteCount)
+  return smiteCount
   
-// func SKAbuffCount()
-//   var pickCount = 0
-//   ?buffs.count > 0
-//     var pickCount = 0
-//     ?string.IndexOf(buffs.string,pick_pocket)
-//       ^ > 0
-//       pickCount = string.Sub(buffs.string, 
-//       ^string.IndexOf(buffs.string,
-//       ^pick_pocket) + 12, 3)
-//       pickCount = string.Sub(pickCount, 0, 
-//       ^string.IndexOf(pickCount,＂:＂))
-//       pickCount = int.parse(pickCount)
-//   return pickCount
+func SKAbuffCount()
+  var pickCount = 0
+  ?buffs.count > 0
+    var pickCount = 0
+    ?string.IndexOf(buffs.string,pick_pocket)
+      ^ > 0
+      pickCount = string.Sub(buffs.string, 
+      ^string.IndexOf(buffs.string,
+      ^pick_pocket) + 12, 3)
+      pickCount = string.Sub(pickCount, 0, 
+      ^string.IndexOf(pickCount,＂:＂))
+      pickCount = int.parse(pickCount)
+  return pickCount
 
 
-// func getPotionInfoCHS()
-//   ?item.potion = Strength
-//     return ＂怪力oo 击晕与破甲＂
-//   :?item.potion = Experience
-//     return ＂经验/` 增加经验和气＂
-//   :?item.potion = Healing
-//     return ＂恢复~≈ 100%回血＂
-//   :?item.potion = Lightning
-//     return ＂闪电.: 150地图炮＂
-//   :?item.potion = Vampiric
-//     return ＂吸血~: 20%吸血＂
-//   :?item.potion = Cleansing
-//     return ＂净化~/ 回血与状态清除＂
-//   :?item.potion = Berserk
-//     return ＂狂暴/: 攻速+15＂
-//   :?item.potion = Lucky
-//     return ＂幸运o: 100%暴击＂
-//   :?item.potion = Invisibility
-//     return ＂隐形o/ 完全闪避＂
-//   :?item.potion = Defensive
-//     return ＂防御~o 回血与回盾＂
-//   :?item.potion = Empty
-//     return ＂空空如也的药瓶＂
+func getPotionInfoCHS()
+  ?item.potion = Strength
+    return ＂怪力oo 击晕与破甲＂
+  :?item.potion = Experience
+    return ＂经验/` 增加经验和气＂
+  :?item.potion = Healing
+    return ＂恢复~≈ 100%回血＂
+  :?item.potion = Lightning
+    return ＂闪电.: 150地图炮＂
+  :?item.potion = Vampiric
+    return ＂吸血~: 20%吸血＂
+  :?item.potion = Cleansing
+    return ＂净化~/ 回血与状态清除＂
+  :?item.potion = Berserk
+    return ＂狂暴/: 攻速+15＂
+  :?item.potion = Lucky
+    return ＂幸运o: 100%暴击＂
+  :?item.potion = Invisibility
+    return ＂隐形o/ 完全闪避＂
+  :?item.potion = Defensive
+    return ＂防御~o 回血与回盾＂
+  :?item.potion = Empty
+    return ＂空空如也的药瓶＂
 
-// func cooldownShowCHS(equipment,posX,posY)
-//   ?item.GetCooldown(equipment) > 0
-//     >`@posX+3@,@posY@,#FF0000,帧
-//     >`@posX@,@posY@,#FF0000,\
-//     ^@item.GetCooldown(equipment)@
-//   :?item.GetCooldown(equipment) <= 0 & 
-//     ^item.CanActivate() = True & 
-//     ^item.CanActivate(equipment) = False
-//     >`@posX@,@posY@,#00FF00, 就绪
-//   :?item.GetCooldown(equipment) <= 0 & 
-//     ^item.CanActivate(equipment) = True
-//     >`@posX@,@posY@,#rainbow, 就绪
-//   :?item.GetCooldown(equipment) <= 0 & 
-//     ^item.CanActivate() = False
-//     >`@posX@,@posY@,#F08080, 等待
+func cooldownShowCHS(equipment,posX,posY)
+  ?item.GetCooldown(equipment) > 0
+    >`@posX+3@,@posY@,#FF0000,帧
+    >`@posX@,@posY@,#FF0000,\
+    ^@item.GetCooldown(equipment)@
+  :?item.GetCooldown(equipment) <= 0 & 
+    ^item.CanActivate() = True & 
+    ^item.CanActivate(equipment) = False
+    >`@posX@,@posY@,#00FF00, 就绪
+  :?item.GetCooldown(equipment) <= 0 & 
+    ^item.CanActivate(equipment) = True
+    >`@posX@,@posY@,#rainbow, 就绪
+  :?item.GetCooldown(equipment) <= 0 & 
+    ^item.CanActivate() = False
+    >`@posX@,@posY@,#F08080, 等待
 
-// func BFcooldownShowCHS(equipment,posX,posY,
-//   ^buffCount)
-//   >`@posX+10@,@posY@,#white,@buffCount@
-//   cooldownShowCHS(equipment,posX,posY)
-//   >`@posX+7@,@posY@,#FF00FF,@BFbuffCount()@
-//   >`@posX+6@,@posY@,#FF00FF,·
+func BFcooldownShowCHS(equipment,posX,posY,
+  ^buffCount)
+  >`@posX+10@,@posY@,#white,@buffCount@
+  cooldownShowCHS(equipment,posX,posY)
+  >`@posX+7@,@posY@,#FF00FF,@BFbuffCount()@
+  >`@posX+6@,@posY@,#FF00FF,·
 
-// func SKAcooldownShowCHS(equipment,posX,posY,
-//   ^buffCount)
-//   >`@posX+10@,@posY@,#white,@buffCount@
-//   cooldownShowCHS(equipment,posX,posY)
-//   >`@posX+7@,@posY@,#FF00FF,@SKAbuffCount()@
-//   >`@posX+6@,@posY@,#FF00FF,≡
+func SKAcooldownShowCHS(equipment,posX,posY,
+  ^buffCount)
+  >`@posX+10@,@posY@,#white,@buffCount@
+  cooldownShowCHS(equipment,posX,posY)
+  >`@posX+7@,@posY@,#FF00FF,@SKAbuffCount()@
+  >`@posX+6@,@posY@,#FF00FF,≡
 
-// func MaskcooldownShowCHS(equipment,posX,posY)
-//   cooldownShowCHS(equipment,posX,posY)
+func MaskcooldownShowCHS(equipment,posX,posY)
+  cooldownShowCHS(equipment,posX,posY)
   
-// ?showUI 
-//   CDTimeShowCHS(1,1,False,False,True)
+?showUI 
+  CDTimeShowCHS(1,1,False,False,True)
